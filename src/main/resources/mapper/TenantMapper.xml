@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.tenant.TenantMapper">
+
+    <resultMap id="TenantResultMap" type="com.example.demo.tenant.Tenant">
+        <id column="id" property="id"/>
+        <result column="tenant_code" property="tenantCode"/>
+        <result column="tenant_name" property="tenantName"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="valid_start_time" property="validStartTime"/>
+        <result column="valid_end_time" property="validEndTime"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id,
+        tenant_code,
+        tenant_name,
+        phone,
+        email,
+        valid_start_time,
+        valid_end_time,
+        remark,
+        status
+    </sql>
+
+    <sql id="QueryWhere">
+        <where>
+            <if test="query != null and query.tenantCode != null and query.tenantCode != ''">
+                tenant_code LIKE CONCAT('%', #{query.tenantCode}, '%')
+            </if>
+            <if test="query != null and query.tenantName != null and query.tenantName != ''">
+                AND tenant_name LIKE CONCAT('%', #{query.tenantName}, '%')
+            </if>
+            <if test="query != null and query.phone != null and query.phone != ''">
+                AND phone LIKE CONCAT('%', #{query.phone}, '%')
+            </if>
+            <if test="query != null and query.status != null">
+                AND status = #{query.status}
+            </if>
+        </where>
+    </sql>
+
+    <select id="list" resultMap="TenantResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM tenant
+        ORDER BY id
+    </select>
+
+    <select id="getPage" resultMap="TenantResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM tenant
+        <include refid="QueryWhere"/>
+        ORDER BY id
+        <if test="query != null and query.pageSize != null">
+            LIMIT #{query.pageSize}
+            <if test="query.offset != null">
+                OFFSET #{query.offset}
+            </if>
+        </if>
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM tenant
+        <include refid="QueryWhere"/>
+    </select>
+
+    <insert id="insert" parameterType="com.example.demo.tenant.Tenant"
+            useGeneratedKeys="true" keyProperty="tenant.id">
+        INSERT INTO tenant (
+            tenant_code,
+            tenant_name,
+            phone,
+            email,
+            valid_start_time,
+            valid_end_time,
+            remark,
+            status
+        )
+        VALUES (
+            #{tenant.tenantCode},
+            #{tenant.tenantName},
+            #{tenant.phone},
+            #{tenant.email},
+            #{tenant.validStartTime},
+            #{tenant.validEndTime},
+            #{tenant.remark},
+            #{tenant.status}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.example.demo.tenant.Tenant">
+        UPDATE tenant
+        SET tenant_code = #{update.tenantCode},
+            tenant_name = #{update.tenantName},
+            phone = #{update.phone},
+            email = #{update.email},
+            valid_start_time = #{update.validStartTime},
+            valid_end_time = #{update.validEndTime},
+            remark = #{update.remark},
+            status = #{update.status}
+        WHERE id = #{update.id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tenant WHERE id = #{id}
+    </delete>
+</mapper>

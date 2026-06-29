@@ -9,10 +9,15 @@ import com.openai.models.responses.ResponseOutputItem;
 import com.openai.models.responses.ResponseOutputText;
 import com.openai.models.responses.ResponseUsage;
 import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+/**
+ * 封装 OpenAI Responses API，并转换为本地返回对象。
+ */
 @Service
+@ConditionalOnProperty(prefix = "openai", name = "enabled", havingValue = "true")
 public class OpenAiResponsesService {
 
     private final OpenAIClient openAIClient;
@@ -23,6 +28,9 @@ public class OpenAiResponsesService {
         this.properties = properties;
     }
 
+    /**
+     * 创建一次模型响应，请求中有覆盖项时优先使用请求参数。
+     */
     public GenerateResponseResult createResponse(GenerateResponseRequest request) {
         String model = StringUtils.hasText(request.model()) ? request.model() : properties.getModel();
 
@@ -59,6 +67,9 @@ public class OpenAiResponsesService {
         );
     }
 
+    /**
+     * 将消息输出块展开并拼接成纯文本结果。
+     */
     private String extractOutputText(Response response) {
         return response.output().stream()
                 .filter(ResponseOutputItem::isMessage)

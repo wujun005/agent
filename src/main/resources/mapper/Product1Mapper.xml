@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.product1.Product1Mapper">
+
+    <resultMap id="Product1ResultMap" type="com.example.demo.product1.Product1">
+        <id column="id" property="id"/>
+        <result column="product_name" property="productName"/>
+        <result column="description" property="description"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="price" property="price"/>
+        <result column="stock" property="stock"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        p.id,
+        p.product_name,
+        p.description,
+        p.category_id,
+        c.name AS category_name,
+        p.price,
+        p.stock,
+        p.status,
+        p.created_at,
+        p.updated_at
+    </sql>
+
+    <sql id="ProductFrom">
+        FROM product p
+        LEFT JOIN category c ON p.category_id = c.id
+    </sql>
+
+    <sql id="ProductNameWhere">
+        <where>
+            <if test="productName != null and productName != ''">
+                p.product_name LIKE CONCAT('%', #{productName}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="Product1ResultMap">
+        SELECT <include refid="BaseColumns"/>
+        <include refid="ProductFrom"/>
+        ORDER BY p.id
+    </select>
+
+    <select id="findByProductNameContaining" resultMap="Product1ResultMap">
+        SELECT <include refid="BaseColumns"/>
+        <include refid="ProductFrom"/>
+        WHERE p.product_name LIKE CONCAT('%', #{productName}, '%')
+        ORDER BY p.id
+    </select>
+
+    <select id="findPage" resultMap="Product1ResultMap">
+        SELECT <include refid="BaseColumns"/>
+        <include refid="ProductFrom"/>
+        <include refid="ProductNameWhere"/>
+        ORDER BY p.id
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM product p
+        <include refid="ProductNameWhere"/>
+    </select>
+
+    <select id="findById" resultMap="Product1ResultMap">
+        SELECT <include refid="BaseColumns"/>
+        <include refid="ProductFrom"/>
+        WHERE p.id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.demo.product1.Product1"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product (product_name, description, category_id, price, stock, status)
+        VALUES (#{productName}, #{description}, #{categoryId}, #{price}, #{stock}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.example.demo.product1.Product1">
+        UPDATE product
+        SET product_name = #{productName},
+            description = #{description},
+            category_id = #{categoryId},
+            price = #{price},
+            stock = #{stock},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM product WHERE id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.category.CategoryMapper">
+
+    <resultMap id="CategoryResultMap" type="com.example.demo.category.Category">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="CategoryResultMap">
+        SELECT id, name
+        FROM category
+        ORDER BY id
+    </select>
+
+    <select id="findByNameContaining" resultMap="CategoryResultMap">
+        SELECT id, name
+        FROM category
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY id
+    </select>
+
+    <select id="findById" resultMap="CategoryResultMap">
+        SELECT id, name
+        FROM category
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.demo.category.Category"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO category (name)
+        VALUES (#{name})
+    </insert>
+
+    <update id="update" parameterType="com.example.demo.category.Category">
+        UPDATE category
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM category WHERE id = #{id}
+    </delete>
+</mapper>

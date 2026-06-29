@@ -5,6 +5,9 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
+/**
+ * AI 响应接口接收的请求体。
+ */
 public record GenerateResponseRequest(
         @NotBlank String input,
         String instructions,

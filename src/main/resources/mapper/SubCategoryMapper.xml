@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.subCategory.SubCategoryMapper">
+
+    <resultMap id="SubCategoryResultMap" type="com.example.demo.subCategory.SubCategory">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id,
+        name,
+        created_at,
+        updated_at
+    </sql>
+
+    <sql id="NameWhere">
+        <where>
+            <if test="name != null and name != ''">
+                name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="SubCategoryResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM sub_category
+        ORDER BY id
+    </select>
+
+    <select id="findPage" resultMap="SubCategoryResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM sub_category
+        <include refid="NameWhere"/>
+        ORDER BY id
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM sub_category
+        <include refid="NameWhere"/>
+    </select>
+
+    <insert id="insert" parameterType="com.example.demo.subCategory.SubCategory"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sub_category (name)
+        VALUES (#{name})
+    </insert>
+
+    <update id="update" parameterType="com.example.demo.subCategory.SubCategory">
+        UPDATE sub_category
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM sub_category WHERE id = #{id}
+    </delete>
+</mapper>
